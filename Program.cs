@@ -11,9 +11,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 //Register the Dependancy
-builder.Services.AddSingleton<IEmployeeRepo , EmployeeRepo>();
+builder.Services.AddScoped<IEmployeeRepo , SqlEmployeeData>();
 //EmployeesAPIDb name of database
-builder.Services.AddDbContext<EmployeeDbContext>(options => options.UseInMemoryDatabase("EmployeesAPIDb"));
+builder.Services.AddDbContextPool<EmployeeDbContext>(options =>options.UseSqlServer(builder.Configuration.GetConnectionString("Connection")));
+//builder.Services.AddDbContext<EmployeeDbContext>(options => options.UseInMemoryDatabase("EmployeesAPIDb"));
 
 var app = builder.Build();
 

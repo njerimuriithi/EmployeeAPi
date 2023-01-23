@@ -21,77 +21,126 @@ namespace EmployeeAPi.Controllers
         }
 
         [HttpGet]
-        
-         public IEnumerable<EmployeeDto> GetEmployees()
+        public IActionResult GetEmployees() 
         {
-            var Employees = emp_Repo.GetEmployees().Select(employee =>employee.AsDto()); 
-            return Employees;
+            return Ok(emp_Repo.GetEmployees());
         }
+
         [HttpGet("{id}")]
-        public ActionResult<EmployeeDto> GetEmployee(Guid id)
+        public IActionResult GetEmployee(Guid id)
         {
-           
-            var employee = emp_Repo.GetEmployees(id);
-            if(employee is null)
-            {
-                return NotFound();
-            }
-            return employee.AsDto();
+          var employee = emp_Repo.GetEmployee(id);
+           if(employee !=null)
+                { 
+                return Ok(employee);
+
+                }
+           return NotFound("Employee not found");
         }
 
         [HttpPost]
-        public ActionResult<EmployeeDto> CreateItem(CreateItemDto EmployeeDto) 
-            {
-            Employee employee = new()
-            {
-               Id=Guid.NewGuid(),
-               Name=EmployeeDto.Name,
-               Occupation=EmployeeDto.Occupation,
-               DateOfEmployment=DateTime.Now,
-               City=EmployeeDto.City,   
-            };
-            emp_Repo.CreateItem(employee);
-
-            return CreatedAtAction(nameof(GetEmployee),new{employee = employee.Id},employee.AsDto());
-            }
-
-        [HttpPut("{id}")]
-
-        public ActionResult UpdateEmployee(Guid id,UpdateDto EmployeeDto)
+        public IActionResult GetEmployee(Employee employee)
         {
-            var existingEmployee = emp_Repo.GetEmployees(id);
-            if(existingEmployee is null)
-            {
-                return NotFound();
-            }
-
-            Employee UpdatedEmployee = existingEmployee with
-            {
-                Name= EmployeeDto.Name,
-                Occupation=EmployeeDto.Occupation,
-                City =EmployeeDto.City,
-            };
-            emp_Repo.UpdateEmployee(UpdatedEmployee);
-
-            return NoContent();
-
+            emp_Repo.CreateItem(employee);
+    
+            return CreatedAtAction("Index", employee);
         }
 
         [HttpDelete("{id}")]
-        public ActionResult DeleteEmployee(Guid id)
+        public IActionResult DeleteEmployee(Guid id)
         {
-            var existingEmployee = emp_Repo.GetEmployees(id);
-            if (existingEmployee is null)
+           var emlp = emp_Repo.GetEmployee(id);
+            if(emlp != null)
             {
-                return NotFound();
-
+                  emp_Repo.DeleteItem(emlp);
+                return Ok();
             }
-
-            emp_Repo.DeleteItem(id);
-            return NoContent(); 
-
-
+            return NotFound("Not Found");
         }
+        [HttpPatch("{id}")]
+        public IActionResult EditEmployee(Guid id ,Employee employee)
+        {
+            var existingEmployee = emp_Repo.GetEmployee(id);
+            if (existingEmployee != null)
+            {
+                employee.Id = existingEmployee.Id;
+                emp_Repo.EditEmployee(employee);
+                
+            }
+            return Ok(employee);
+        }
+
+
+        // public IEnumerable<EmployeeDto> GetEmployees()
+        //{
+        //    var Employees = emp_Repo.GetEmployees().Select(employee =>employee.AsDto()); 
+        //    return Employees;
+        //}
+        //[HttpGet("{id}")]
+        //public ActionResult<EmployeeDto> GetEmployee(Guid id)
+        //{
+
+        //    var employee = emp_Repo.GetEmployees(id);
+        //    if(employee is null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return employee.AsDto();
+        //}
+
+        //[HttpPost]
+        //public ActionResult<EmployeeDto> CreateItem(CreateItemDto EmployeeDto) 
+        //    {
+        //    Employee employee = new()
+        //    {
+        //       Id=Guid.NewGuid(),
+        //       Name=EmployeeDto.Name,
+        //       Occupation=EmployeeDto.Occupation,
+        //       DateOfEmployment=DateTime.Now,
+        //       City=EmployeeDto.City,   
+        //    };
+        //    emp_Repo.CreateItem(employee);
+
+        //    return CreatedAtAction(nameof(GetEmployee),new{employee = employee.Id},employee.AsDto());
+        //    }
+
+        //[HttpPut("{id}")]
+
+        //public ActionResult UpdateEmployee(Guid id,UpdateDto EmployeeDto)
+        //{
+        //    var existingEmployee = emp_Repo.GetEmployees(id);
+        //    if(existingEmployee is null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    Employee UpdatedEmployee = existingEmployee with
+        //    {
+        //        Name= EmployeeDto.Name,
+        //        Occupation=EmployeeDto.Occupation,
+        //        City =EmployeeDto.City,
+        //    };
+        //    emp_Repo.UpdateEmployee(UpdatedEmployee);
+
+        //    return NoContent();
+
+        //}
+
+        //[HttpDelete("{id}")]
+        //public ActionResult DeleteEmployee(Guid id)
+        //{
+        //    var existingEmployee = emp_Repo.GetEmployees(id);
+        //    if (existingEmployee is null)
+        //    {
+        //        return NotFound();
+
+        //    }
+
+        //    emp_Repo.DeleteItem(id);
+        //    return NoContent(); 
+
+
+        //}
 
     }
 }
